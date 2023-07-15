@@ -9,6 +9,7 @@ namespace DapperAdvanced.Data.Repositories;
 public interface IOrderRepository
 {
     Task CreateOrder(IEnumerable<OrderDetail> OrderDetails);
+    Task<IEnumerable<OrderDetail>> OrderDetail();
 }
 
 public class OrderRepository : IOrderRepository
@@ -57,6 +58,31 @@ public class OrderRepository : IOrderRepository
                throw;
         }        
                 
+    }
+    
+
+    public async Task<IEnumerable<OrderDetail>> OrderDetail()
+    {
+        using IDbConnection connection = new SqlConnection(_config.GetConnectionString("default"));
+        var sql = @"select *
+ from  OrderDetail od join [order] o
+on od.OrderId = o.Id
+join book b on od.ProductId=b.Id
+                    ";
+        var orderDetail = await connection.QueryAsync<OrderDetail, Order, Book, OrderDetail>
+        (sql, (orderDetail, order, book) =>
+        {
+            orderDetail.Order = order;
+            orderDetail.Book = book;
+            return orderDetail;
+        });
+
+        // var sql=@"select od.*,o.*
+        //             from  OrderDetail od join [order] o
+        //             on od.OrderId = o.Id";
+        // var orderDetail = await connection.QueryAsync<OrderDetail, Order, OrderDetail>(sql, (orderDetail, order) => { orderDetail.Order = order; return orderDetail; });
+
+        return orderDetail;
     }
 
 }

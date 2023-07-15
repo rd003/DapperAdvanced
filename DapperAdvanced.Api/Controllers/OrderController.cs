@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DapperAdvanced.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -33,6 +33,20 @@ namespace DapperAdvanced.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong!");
            }
            
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> OrderDetail()
+        {
+            try
+            {
+                var orderDetail = await _orderRepo.OrderDetail();
+                return Ok(orderDetail);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);                 
+            }
         }
 
     }
