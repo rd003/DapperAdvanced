@@ -1,4 +1,5 @@
-﻿using DapperAdvanced.Data.Models;
+﻿using System.Runtime.CompilerServices;
+using DapperAdvanced.Data.Models;
 using DapperAdvanced.Data.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +46,33 @@ namespace DapperAdvanced.Api
             }
         }
 
+        [HttpGet("/book-detail/{id}")]
+        public async Task<IActionResult> GetBookDetail(Guid id)
+        {
+            try
+            {
+                var (title,author)= await _bookRepository.GetBookDetail(id);
+                return Ok(new {title,author});
+            }
+            catch (Exception ex)
+            {
+               return StatusCode(StatusCodes.Status500InternalServerError,"Oops! something went wrong");
+            }
+        }
+
+         [HttpGet("/multi")]
+         public async Task<IActionResult> GetMultipleDs()
+         {
+            try
+            {
+                var (genres,books)= await _bookRepository.GetMultiple();
+                return Ok(new { genres,books});
+            }
+            catch (Exception ex)
+            {
+               return StatusCode(StatusCodes.Status500InternalServerError,"Oops! something went wrong");
+            }
+        }
 
     }
 }
