@@ -9,8 +9,6 @@ public class Order
     public string? CustomerName { get; set; }
     public string? PhoneNumber { get; set; }
     
-    // for loading related entity
-    
     public ICollection<OrderDetail>? OrderDetails { get; set; }
 
 }

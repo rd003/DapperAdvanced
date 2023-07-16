@@ -64,19 +64,23 @@ public class OrderRepository : IOrderRepository
     public async Task<IEnumerable<OrderDetail>> OrderDetail()
     {
         using IDbConnection connection = new SqlConnection(_config.GetConnectionString("default"));
-        var sql = @"select *
+        var sql = @"select o.Id,o.CustomerName,o.PhoneNumber
+                    ,b.Id,b.title,b.author,b.[Year],
+                    od.Id,od.OrderId,od.ProductId, od.Price,od.Quantity
                     from  OrderDetail od join [order] o
                     on od.OrderId = o.Id
                     join book b on od.ProductId=b.Id
                     ";
-        var orderDetail = await connection.QueryAsync<OrderDetail, Order, Book, OrderDetail>
-        (sql, (orderDetail, order, book) =>
+        var orderDetail = await connection.QueryAsync<Order, Book,OrderDetail, OrderDetail>
+        (sql, (order, book,orderDetail) =>
         {
             orderDetail.Order = order;
             orderDetail.Book = book;
             return orderDetail;
-        });
+        },splitOn:"Id");
         return orderDetail;
     }
+
+    
 
 }
