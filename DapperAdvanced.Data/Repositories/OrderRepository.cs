@@ -65,9 +65,9 @@ public class OrderRepository : IOrderRepository
     {
         using IDbConnection connection = new SqlConnection(_config.GetConnectionString("default"));
         var sql = @"select *
- from  OrderDetail od join [order] o
-on od.OrderId = o.Id
-join book b on od.ProductId=b.Id
+                    from  OrderDetail od join [order] o
+                    on od.OrderId = o.Id
+                    join book b on od.ProductId=b.Id
                     ";
         var orderDetail = await connection.QueryAsync<OrderDetail, Order, Book, OrderDetail>
         (sql, (orderDetail, order, book) =>
@@ -76,12 +76,6 @@ join book b on od.ProductId=b.Id
             orderDetail.Book = book;
             return orderDetail;
         });
-
-        // var sql=@"select od.*,o.*
-        //             from  OrderDetail od join [order] o
-        //             on od.OrderId = o.Id";
-        // var orderDetail = await connection.QueryAsync<OrderDetail, Order, OrderDetail>(sql, (orderDetail, order) => { orderDetail.Order = order; return orderDetail; });
-
         return orderDetail;
     }
 

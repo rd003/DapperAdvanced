@@ -1,7 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using DapperAdvanced.Data.Models;
+﻿using DapperAdvanced.Data.Models;
 using DapperAdvanced.Data.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DapperAdvanced.Api
@@ -67,6 +65,20 @@ namespace DapperAdvanced.Api
             {
                 var (genres,books)= await _bookRepository.GetMultiple();
                 return Ok(new { genres,books});
+            }
+            catch (Exception ex)
+            {
+               return StatusCode(StatusCodes.Status500InternalServerError,"Oops! something went wrong");
+            }
+        }
+
+        [HttpGet("/books-with-genre")]
+        public async Task<IActionResult> GetBooksWithGenres()
+         {
+            try
+            {
+                var books= await _bookRepository.GetBooksWithGenres();
+                return Ok(books);
             }
             catch (Exception ex)
             {

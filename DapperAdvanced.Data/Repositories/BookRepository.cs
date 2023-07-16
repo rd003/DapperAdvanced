@@ -13,6 +13,7 @@ namespace DapperAdvanced.Data.Repositories
         Task<IEnumerable<Book>> GetBooks();
         Task<(string, string)> GetBookDetail(Guid id);
         Task<(IEnumerable<Genre>, IEnumerable<Book>)> GetMultiple();
+        Task<IEnumerable<Book>> GetBooksWithGenres();
     }
 
     public class BookRepository : IBookRepository
@@ -77,5 +78,41 @@ namespace DapperAdvanced.Data.Repositories
             var books = multi.Read<Book>().ToList();
             return (genres, books);
          }
+
+         public async Task<IEnumerable<Book>> GetBooksWithGenres()
+         {
+            string query = @"
+        SELECT 
+            b.Id,
+            b.Title,
+            b.Author,
+            b.Year,
+            g.Id AS GenreId,
+            g.Name AS GenreName
+        FROM Book b
+        INNER JOIN Book_Genre bg ON b.Id = bg.BookId
+        INNER JOIN Genre g ON bg.GenreId = g.Id";
+
+            using var connection = new SqlConnection(_config.GetConnectionString("default"));
+            var booksDictionary = new Dictionary<Guid, Book>();
+
+            await connection.QueryAsync<Book, GenreVm, Book>(
+                sql: query,
+                map: (book, genre) =>
+                {
+                    if (!booksDictionary.TryGetValue(book.Id, out var bookEntry))
+                    {
+                        bookEntry = book;
+                        bookEntry.Genres = new List<GenreVm>();
+                        booksDictionary.Add(bookEntry.Id, bookEntry);
+                    }
+                    bookEntry?.Genres?.Add(genre);
+                    return bookEntry;
+                },
+                splitOn: "GenreId"
+            );
+
+            return booksDictionary.Values;
+        }
     }
 }

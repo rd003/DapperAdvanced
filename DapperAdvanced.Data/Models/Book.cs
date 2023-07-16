@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DapperAdvanced.Data.Models
+﻿namespace DapperAdvanced.Data.Models
 {
     public class Book
     {
@@ -12,7 +6,8 @@ namespace DapperAdvanced.Data.Models
         public string? Title { get; set; }
         public string? Author { get; set; }
         public int Year { get; set; }
-
-        public ICollection<OrderDetail>? OrderDetails { get; set; }
+        
+        public List<OrderDetail>? OrderDetails { get; set; }
+        public List<GenreVm>? Genres { get; set; }
     }
 }
